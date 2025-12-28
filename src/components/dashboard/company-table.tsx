@@ -12,6 +12,7 @@ import Link from "next/link";
 import { sincronizarCompleto } from "@/services/sunat/sunat-service";
 import { generarZipSimuladoSire, procesarArchivoSireRealista } from "@/services/sunat/zip-simulator";
 import { supabase } from "@/lib/supabase/client";
+import { UploadZipButton } from "./UploadZipButton";
 
 export function CompanyTable({ companies }: { companies: any[] }) {
     const [syncing, setSyncing] = useState<string | null>(null);
@@ -97,14 +98,15 @@ export function CompanyTable({ companies }: { companies: any[] }) {
                                         <FlaskConical className={`h-3 w-3 mr-2 ${syncing === empresa.id + '-sim' ? 'animate-spin' : ''}`} />
                                         Simular ZIP
                                     </Button>
+                                    <UploadZipButton empresaId={empresa.id} />
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => handleSync(empresa)}
-                                        disabled={syncing !== null}
-                                        className="h-8 border-slate-200 hover:border-sky-400 hover:text-sky-600"
+                                        disabled={true}
+                                        title="Temporalmente deshabilitado - API SUNAT SIRE no disponible. Usa 'Simular ZIP' o 'Subir ZIP'"
+                                        className="h-8 border-slate-200 text-slate-400 cursor-not-allowed opacity-50"
                                     >
-                                        <RefreshCw className={`h-3 w-3 mr-2 ${syncing === empresa.id ? 'animate-spin' : ''}`} />
+                                        <RefreshCw className="h-3 w-3 mr-2" />
                                         SUNAT API
                                     </Button>
                                     <Link href={`/dashboard/${empresa.id}`}>
