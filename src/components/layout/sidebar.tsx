@@ -37,15 +37,16 @@ export function Sidebar() {
                         <Link
                             key={item.name}
                             href={item.href}
+                            prefetch={true}
                             className={cn(
-                                "group flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                                "group flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150",
                                 isActive
-                                    ? "bg-slate-800 text-white"
+                                    ? "bg-slate-800 text-white shadow-lg shadow-slate-900/50"
                                     : "text-slate-400 hover:bg-slate-800 hover:text-white"
                             )}
                         >
                             <item.icon className={cn(
-                                "mr-3 h-5 w-5 flex-shrink-0",
+                                "mr-3 h-5 w-5 flex-shrink-0 transition-colors duration-150",
                                 isActive ? "text-sky-400" : "text-slate-400 group-hover:text-white"
                             )} />
                             {item.name}
