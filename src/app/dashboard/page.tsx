@@ -1,17 +1,37 @@
-
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { StatsOverview } from "@/components/dashboard/stats-overview";
-import { CompanyTable } from "@/components/dashboard/company-table";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 
+// Lazy load CompanyTable para mejorar tiempo de carga inicial
+const CompanyTable = dynamic(() => import("@/components/dashboard/company-table").then(mod => ({ default: mod.CompanyTable })), {
+    loading: () => <TableSkeleton />,
+    ssr: false
+});
+
+function TableSkeleton() {
+    return (
+        <div className="rounded-xl border bg-white shadow-sm overflow-hidden animate-pulse">
+            <div className="p-4 border-b bg-slate-50/50 h-14"></div>
+            <div className="p-4 space-y-3">
+                {[1, 2, 3].map(i => (
+                    <div key={i} className="h-16 bg-slate-100 rounded"></div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 export default async function DashboardPage() {
-    // Fetch real companies from Supabase
+    // Fetch companies with optimized query - solo campos necesarios
     const { data: companies, error } = await supabase
         .from('empresas')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('id, ruc, razon_social, created_at')
+        .order('created_at', { ascending: false })
+        .limit(50); // Limitar resultados iniciales
 
     if (error) {
         console.error("Error fetching companies:", error);
