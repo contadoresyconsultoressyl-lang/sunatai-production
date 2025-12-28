@@ -1,4 +1,6 @@
-import { Suspense } from "react";
+"use client";
+
+import { Suspense, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { StatsOverview } from "@/components/dashboard/stats-overview";
 import { Button } from "@/components/ui/button";
@@ -25,17 +27,27 @@ function TableSkeleton() {
     );
 }
 
-export default async function DashboardPage() {
-    // Fetch companies with optimized query - solo campos necesarios
-    const { data: companies, error } = await supabase
-        .from('empresas')
-        .select('id, ruc, razon_social, created_at')
-        .order('created_at', { ascending: false })
-        .limit(50); // Limitar resultados iniciales
+export default function DashboardPage() {
+    const [companies, setCompanies] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    if (error) {
-        console.error("Error fetching companies:", error);
-    }
+    useEffect(() => {
+        async function fetchCompanies() {
+            const { data, error } = await supabase
+                .from('empresas')
+                .select('id, ruc, razon_social, created_at')
+                .order('created_at', { ascending: false })
+                .limit(50);
+
+            if (error) {
+                console.error("Error fetching companies:", error);
+            } else {
+                setCompanies(data || []);
+            }
+            setLoading(false);
+        }
+        fetchCompanies();
+    }, []);
 
     return (
         <div className="space-y-8">
@@ -54,7 +66,9 @@ export default async function DashboardPage() {
             <StatsOverview />
 
             <div className="space-y-4">
-                {companies && companies.length > 0 ? (
+                {loading ? (
+                    <TableSkeleton />
+                ) : companies && companies.length > 0 ? (
                     <CompanyTable companies={companies} />
                 ) : (
                     <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
